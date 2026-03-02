@@ -1,0 +1,56 @@
+name: Build macOS VST3 & AU
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Clone JUCE
+        run: |
+          git clone --depth 1 --branch 7.0.9 https://github.com/juce-framework/JUCE.git ../JUCE
+
+      - name: Install Projucer
+        run: |
+          cd ../JUCE/extras/Projucer/Builds/MacOSX
+          xcodebuild -project Projucer.xcodeproj \
+                     -scheme Projucer \
+                     -configuration Release \
+                     -derivedDataPath build \
+                     CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
+                     build
+          cp build/Build/Products/Release/Projucer.app/Contents/MacOS/Projucer /usr/local/bin/projucer
+          chmod +x /usr/local/bin/projucer
+
+      - name: Generate Xcode project
+        run: projucer --resave KeroMixAI.jucer
+
+      - name: Build Release (VST3 + AU)
+        run: |
+          xcodebuild -project Builds/MacOSX/KeroMixAI.xcodeproj \
+                     -scheme "KeroMixAI - All" \
+                     -configuration Release \
+                     -derivedDataPath build \
+                     CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
+                     ARCHS="arm64 x86_64" \
+                     build
+
+      - name: Collect artifacts
+        run: |
+          mkdir -p dist
+          find build -name "*.vst3" -exec cp -r {} dist/ \;
+          find build -name "*.component" -exec cp -r {} dist/ \;
+
+      - name: Upload VST3 & AU
+        uses: actions/upload-artifact@v4
+        with:
+          name: KeroMixAI-mac
+          path: dist/
+          retention-days: 30
