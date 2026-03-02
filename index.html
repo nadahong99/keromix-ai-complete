@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KeroMixAI - AI Audio Mixing Plugin</title>
+  <meta name="description" content="AI-powered audio plugin. Control EQ, Comp, Delay, Reverb with text. VST3/AU.">
+
+  <!-- Google AdSense - replace with your code -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --green: #3ddc6e;
+      --bg: #0b0f0c;
+      --bg2: #111710;
+      --bg3: #161d14;
+      --surface: #1a2318;
+      --border: #253021;
+      --text: #e8f0e6;
+      --text-dim: #7a9478;
+      --mono: 'Space Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 16px; line-height: 1.6; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 9999; opacity: 0.4; }
+
+    /* NAV */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 18px 40px; background: rgba(11,15,12,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+    .nav-logo { font-family: var(--mono); font-size: 1.1rem; color: var(--green); letter-spacing: 0.05em; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+    .nav-right { display: flex; align-items: center; gap: 24px; }
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--green); }
+
+    /* LANG TOGGLE */
+    .lang-toggle { display: flex; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; font-family: var(--mono); font-size: 0.75rem; }
+    .lang-btn { padding: 6px 14px; cursor: pointer; color: var(--text-dim); transition: all 0.2s; border: none; background: transparent; font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.05em; }
+    .lang-btn.active { background: var(--green); color: #0b0f0c; font-weight: 700; }
+    .lang-btn:hover:not(.active) { color: var(--text); }
+
+    /* HERO */
+    .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 120px 40px 80px; position: relative; overflow: hidden; }
+    .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 50% 60%, rgba(61,220,110,0.07) 0%, transparent 70%), radial-gradient(ellipse 40% 30% at 20% 30%, rgba(61,220,110,0.04) 0%, transparent 60%); }
+    .hero-grid { position: absolute; inset: 0; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 40px 40px; opacity: 0.4; mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 70%); }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(61,220,110,0.08); border: 1px solid rgba(61,220,110,0.25); border-radius: 100px; padding: 6px 16px; font-family: var(--mono); font-size: 0.75rem; color: var(--green); letter-spacing: 0.08em; margin-bottom: 32px; position: relative; animation: fadeUp 0.6s ease both; }
+    .badge-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 2s ease infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+    .hero h1 { font-family: var(--mono); font-size: clamp(3.5rem, 10vw, 7rem); font-weight: 700; color: var(--green); letter-spacing: -0.02em; line-height: 0.95; margin-bottom: 12px; position: relative; animation: fadeUp 0.6s 0.1s ease both; }
+    .hero-sub { font-size: clamp(1rem, 2.5vw, 1.35rem); color: var(--text-dim); font-weight: 300; max-width: 520px; margin-bottom: 48px; animation: fadeUp 0.6s 0.2s ease both; }
+    .hero-sub strong { color: var(--text); font-weight: 500; }
+    .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; animation: fadeUp 0.6s 0.3s ease both; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* BUTTONS */
+    .btn-primary { display: inline-flex; align-items: center; gap: 10px; background: var(--green); color: #0b0f0c; font-family: var(--mono); font-size: 0.875rem; font-weight: 700; padding: 14px 28px; border-radius: 6px; text-decoration: none; letter-spacing: 0.04em; transition: all 0.2s; position: relative; overflow: hidden; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(61,220,110,0.3); }
+    .btn-secondary { display: inline-flex; align-items: center; gap: 10px; background: transparent; color: var(--text); font-family: var(--mono); font-size: 0.875rem; padding: 14px 28px; border-radius: 6px; text-decoration: none; letter-spacing: 0.04em; border: 1px solid var(--border); transition: all 0.2s; }
+    .btn-secondary:hover { border-color: var(--green); color: var(--green); transform: translateY(-2px); }
+
+    /* AD */
+    .ad-banner { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 16px; text-align: center; }
+    .ad-slot { min-height: 90px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border: 1px dashed var(--border); border-radius: 4px; max-width: 728px; margin: 8px auto 0; color: var(--text-dim); font-size: 0.75rem; font-family: var(--mono); }
+    .ad-inline { margin: 60px auto; text-align: center; max-width: 1100px; padding: 0 40px; }
+    .ad-inline-label { font-family: var(--mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.12em; margin-bottom: 8px; }
+    .ad-slot-rect { min-height: 250px; max-width: 336px; margin: 0 auto; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border: 1px dashed var(--border); border-radius: 4px; color: var(--text-dim); font-size: 0.75rem; font-family: var(--mono); }
+
+    /* SECTIONS */
+    .section { padding: 100px 40px; max-width: 1100px; margin: 0 auto; }
+    .section-label { font-family: var(--mono); font-size: 0.7rem; color: var(--green); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 16px; }
+    .section-title { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 600; line-height: 1.15; margin-bottom: 16px; letter-spacing: -0.02em; }
+    .section-desc { color: var(--text-dim); max-width: 540px; margin-bottom: 60px; font-size: 1rem; line-height: 1.7; }
+
+    /* SCREENSHOT */
+    .screenshot-wrap { position: relative; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(61,220,110,0.08); }
+    .screenshot-wrap img { width: 100%; display: block; }
+    .screenshot-glow { position: absolute; inset: -1px; border-radius: 12px; background: linear-gradient(135deg, rgba(61,220,110,0.12), transparent 50%); pointer-events: none; }
+    .screenshot-placeholder { min-height: 400px; display: flex; align-items: center; justify-content: center; background: var(--surface); color: var(--text-dim); font-family: var(--mono); font-size: 0.8rem; flex-direction: column; gap: 12px; }
+
+    /* FEATURES */
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 28px; transition: border-color 0.2s, transform 0.2s; }
+    .feature-card:hover { border-color: rgba(61,220,110,0.35); transform: translateY(-3px); }
+    .feature-icon { font-size: 1.6rem; margin-bottom: 16px; }
+    .feature-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; font-family: var(--mono); color: var(--green); }
+    .feature-card p { font-size: 0.875rem; color: var(--text-dim); line-height: 1.6; }
+
+    /* DOWNLOAD */
+    .download-section { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .download-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 48px; }
+    .download-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 28px; display: flex; flex-direction: column; gap: 12px; }
+    .os-badge { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em; color: var(--green); background: rgba(61,220,110,0.1); border: 1px solid rgba(61,220,110,0.2); padding: 4px 10px; border-radius: 4px; display: inline-block; width: fit-content; }
+    .os-badge-blue { color: #6496ff; background: rgba(100,150,255,0.1); border-color: rgba(100,150,255,0.25); }
+    .download-card h3 { font-size: 1.1rem; font-weight: 600; }
+    .download-card p { font-size: 0.85rem; color: var(--text-dim); flex: 1; }
+    .btn-dl { display: inline-flex; align-items: center; gap: 8px; background: var(--green); color: #0b0f0c; font-family: var(--mono); font-size: 0.8rem; font-weight: 700; padding: 10px 20px; border-radius: 6px; text-decoration: none; letter-spacing: 0.04em; transition: all 0.2s; width: fit-content; }
+    .btn-dl:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(61,220,110,0.3); }
+    .btn-dl-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-dl-outline:hover { border-color: var(--green); color: var(--green); box-shadow: none; }
+
+    /* SUPPORT */
+    .support-box { background: linear-gradient(135deg, var(--surface), var(--bg3)); border: 1px solid var(--border); border-radius: 12px; padding: 40px; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+    .support-box h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 6px; }
+    .support-box p { color: var(--text-dim); font-size: 0.9rem; }
+    .btn-coffee { display: inline-flex; align-items: center; gap: 10px; background: #FFDD00; color: #1a1a1a; font-family: var(--mono); font-size: 0.875rem; font-weight: 700; padding: 14px 24px; border-radius: 8px; text-decoration: none; letter-spacing: 0.03em; transition: all 0.2s; white-space: nowrap; }
+    .btn-coffee:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,221,0,0.3); }
+
+    /* FOOTER */
+    footer { border-top: 1px solid var(--border); padding: 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; max-width: 1100px; margin: 0 auto; }
+    footer .footer-logo { font-family: var(--mono); color: var(--green); font-size: 0.9rem; }
+
+    /* REVEAL */
+    .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .hero { padding: 100px 20px 60px; }
+      .section { padding: 60px 20px; }
+      .support-box { flex-direction: column; }
+      footer { padding: 32px 20px; flex-direction: column; text-align: center; }
+      .ad-inline { padding: 0 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-logo" href="#">
+      <span>🐸</span> KeroMixAI
+    </a>
+    <div class="nav-right">
+      <ul class="nav-links">
+        <li><a href="#features" data-ko="기능" data-en="Features">기능</a></li>
+        <li><a href="#screenshot" data-ko="스크린샷" data-en="Screenshot">스크린샷</a></li>
+        <li><a href="#download" data-ko="다운로드" data-en="Download">다운로드</a></li>
+        <li><a href="#support" data-ko="후원" data-en="Support">후원</a></li>
+      </ul>
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('ko')">KO</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      VST3 · AU · Windows · macOS
+    </div>
+    <h1>KeroMixAI</h1>
+    <p class="hero-sub">
+      <strong data-ko="텍스트로 하는 믹싱." data-en="Mixing with text.">텍스트로 하는 믹싱.</strong><br>
+      <span data-ko="원하는 사운드를 타이핑하면" data-en="Just type what you want to hear —">원하는 사운드를 타이핑하면</span><br>
+      <span data-ko="AI가 EQ, 컴프, 딜레이, 리버브를 실시간으로 조절합니다." data-en="AI adjusts EQ, Comp, Delay & Reverb in real time.">AI가 EQ, 컴프, 딜레이, 리버브를 실시간으로 조절합니다.</span>
+    </p>
+    <div class="hero-actions">
+      <a href="#download" class="btn-primary" data-ko="↓ 무료 다운로드" data-en="↓ Free Download">↓ 무료 다운로드</a>
+      <a href="#screenshot" class="btn-secondary" data-ko="스크린샷 보기" data-en="View Screenshot">스크린샷 보기</a>
+    </div>
+  </section>
+
+
+
+  <!-- SCREENSHOT -->
+  <section class="section" id="screenshot">
+    <div class="reveal">
+      <div class="section-label">// PREVIEW</div>
+      <h2 class="section-title" data-ko="한눈에 보이는<br>직관적인 인터페이스" data-en="Intuitive interface,<br>everything at a glance">한눈에 보이는<br>직관적인 인터페이스</h2>
+      <p class="section-desc" data-ko="EQ, 컴프레서, 딜레이, 리버브를 한 화면에서 제어하고, 오른쪽 AI MIX 패널에서 텍스트로 명령하세요." data-en="Control EQ, Compressor, Delay, and Reverb in one view. Type commands in the AI MIX panel on the right.">EQ, 컴프레서, 딜레이, 리버브를 한 화면에서 제어하고, 오른쪽 AI MIX 패널에서 텍스트로 명령하세요.</p>
+      <div class="screenshot-wrap">
+        <img src="screenshot.png" alt="KeroMixAI screenshot" onerror="this.style.display='none';document.getElementById('ss-placeholder').style.display='flex'">
+        <div id="ss-placeholder" class="screenshot-placeholder" style="display:none;">
+          <span style="font-size:3rem;">🐸</span>
+          <span style="font-family:var(--mono);font-size:0.8rem;" data-ko="screenshot.png 파일을 같은 폴더에 넣어주세요" data-en="Place screenshot.png in the same folder">screenshot.png 파일을 같은 폴더에 넣어주세요</span>
+        </div>
+        <div class="screenshot-glow"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AD -->
+  <div style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:20px;text-align:center;">
+    <div style="font-family:var(--mono);font-size:0.65rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:8px;">ADVERTISEMENT</div>
+    <div style="min-height:90px;max-width:728px;margin:0 auto;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02);border:1px dashed var(--border);border-radius:4px;color:var(--text-dim);font-size:0.75rem;font-family:var(--mono);">
+      <!-- Google AdSense 728x90 코드를 여기에 붙여넣으세요 -->
+      <span>AdSense 728×90</span>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="reveal">
+      <div class="section-label">// FEATURES</div>
+      <h2 class="section-title" data-ko="기능 소개" data-en="What it does">기능 소개</h2>
+      <p class="section-desc" data-ko="KeroMixAI가 기존 플러그인과 다른 점들." data-en="What makes KeroMixAI different from other plugins.">KeroMixAI가 기존 플러그인과 다른 점들.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">⌨️</div>
+        <h3 data-ko="텍스트 제어" data-en="Text Control">텍스트 제어</h3>
+        <p data-ko="'따뜻하게', '답답해', '새벽감성' 등 한국어 또는 영어로 자유롭게 입력하면 AI가 즉시 파라미터를 조정합니다." data-en="Type anything — 'warmer', 'muddy', 'moody late night' — in Korean or English, and the AI adjusts instantly.">'따뜻하게', '답답해', '새벽감성' 등 한국어 또는 영어로 자유롭게 입력하면 AI가 즉시 파라미터를 조정합니다.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🎚️</div>
+        <h3 data-ko="강도 인식" data-en="Intensity Scale">강도 인식</h3>
+        <p data-ko="'아주조금 밝게'와 '아주많이 밝게'는 결과가 다릅니다. 7단계 강도 스케일로 세밀하게 제어하세요." data-en="'slightly brighter' and 'much brighter' produce different results. 7-level intensity scale for precise control.">'아주조금 밝게'와 '아주많이 밝게'는 결과가 다릅니다. 7단계 강도 스케일로 세밀하게 제어하세요.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">📊</div>
+        <h3 data-ko="실시간 분석" data-en="Real-time Analysis">실시간 분석</h3>
+        <p data-ko="AI가 현재 오디오의 저/중/고음 에너지를 실시간으로 분석해 맥락에 맞는 판단을 내립니다." data-en="AI analyzes your audio's low/mid/high energy in real time to make context-aware decisions.">AI가 현재 오디오의 저/중/고음 에너지를 실시간으로 분석해 맥락에 맞는 판단을 내립니다.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🔒</div>
+        <h3 data-ko="섹션 락" data-en="Section Lock">섹션 락</h3>
+        <p data-ko="EQ, 컴프, 딜레이, 리버브 각 섹션을 잠가서 AI가 변경하지 못하도록 보호할 수 있습니다." data-en="Lock any section — EQ, Comp, Delay, or Reverb — so the AI can't touch it.">EQ, 컴프, 딜레이, 리버브 각 섹션을 잠가서 AI가 변경하지 못하도록 보호할 수 있습니다.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">↩️</div>
+        <h3>Undo</h3>
+        <p data-ko="AI 변경이 마음에 들지 않으면 Undo 버튼 한 번으로 즉시 되돌릴 수 있습니다." data-en="Don't like the result? One click to revert everything the AI changed.">AI 변경이 마음에 들지 않으면 Undo 버튼 한 번으로 즉시 되돌릴 수 있습니다.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">💾</div>
+        <h3 data-ko="패치 시스템" data-en="Patch System">패치 시스템</h3>
+        <p data-ko="마음에 드는 설정을 패치로 저장하고 언제든지 불러올 수 있습니다." data-en="Save your favorite settings as patches and recall them any time.">마음에 드는 설정을 패치로 저장하고 언제든지 불러올 수 있습니다.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- AD -->
+  <div style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:20px;text-align:center;">
+    <div style="font-family:var(--mono);font-size:0.65rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:8px;">ADVERTISEMENT</div>
+    <div style="min-height:90px;max-width:728px;margin:0 auto;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02);border:1px dashed var(--border);border-radius:4px;color:var(--text-dim);font-size:0.75rem;font-family:var(--mono);">
+      <!-- Google AdSense 728x90 코드를 여기에 붙여넣으세요 -->
+      <span>AdSense 728×90</span>
+    </div>
+  </div>
+
+  <!-- AD -->
+  <div style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:20px;text-align:center;">
+    <div style="font-family:var(--mono);font-size:0.65rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:8px;">ADVERTISEMENT</div>
+    <div style="min-height:90px;max-width:728px;margin:0 auto;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02);border:1px dashed var(--border);border-radius:4px;color:var(--text-dim);font-size:0.75rem;font-family:var(--mono);">
+      <!-- Google AdSense 728x90 코드를 여기에 붙여넣으세요 -->
+      <span>AdSense 728×90</span>
+    </div>
+  </div>
+
+  <!-- DOWNLOAD -->
+  <section class="download-section" id="download">
+    <div class="section" style="padding-top:80px;padding-bottom:80px;">
+      <div class="reveal">
+        <div class="section-label">// DOWNLOAD</div>
+        <h2 class="section-title" data-ko="다운로드" data-en="Download">다운로드</h2>
+        <p class="section-desc" data-ko="무료로 사용할 수 있습니다. AI 기능 사용을 위해 무료 Groq API 키가 필요합니다." data-en="Free to use. A free Groq API key is required for AI features.">무료로 사용할 수 있습니다. AI 기능 사용을 위해 무료 Groq API 키가 필요합니다.</p>
+      </div>
+      <div class="download-grid">
+        <div class="download-card reveal">
+          <span class="os-badge">WINDOWS</span>
+          <h3>Windows (VST3)</h3>
+          <p data-ko="Ableton, FL Studio, Cubase, Reaper 등 VST3를 지원하는 모든 DAW에서 사용 가능합니다." data-en="Works with any DAW that supports VST3 — Ableton, FL Studio, Cubase, Reaper, and more.">Ableton, FL Studio, Cubase, Reaper 등 VST3를 지원하는 모든 DAW에서 사용 가능합니다.</p>
+          <a href="#" class="btn-dl">↓ KeroMixAI.vst3</a>
+        </div>
+        <div class="download-card reveal">
+          <span class="os-badge">MACOS</span>
+          <h3>Mac (VST3)</h3>
+          <p data-ko="Ableton, Cubase, Reaper 등 macOS에서 VST3를 지원하는 DAW용입니다." data-en="For macOS DAWs that support VST3 — Ableton, Cubase, Reaper, and more.">Ableton, Cubase, Reaper 등 macOS에서 VST3를 지원하는 DAW용입니다.</p>
+          <a href="#" class="btn-dl">↓ KeroMixAI.vst3</a>
+        </div>
+        <div class="download-card reveal">
+          <span class="os-badge">LOGIC PRO · GARAGEBAND</span>
+          <h3>Mac (AU)</h3>
+          <p data-ko="Logic Pro와 GarageBand 전용 Audio Unit 포맷입니다." data-en="Audio Unit format for Logic Pro and GarageBand.">Logic Pro와 GarageBand 전용 Audio Unit 포맷입니다.</p>
+          <a href="#" class="btn-dl">↓ KeroMixAI.component</a>
+        </div>
+        <div class="download-card reveal">
+          <span class="os-badge os-badge-blue">MANUAL</span>
+          <h3 data-ko="사용 설명서" data-en="User Manual">사용 설명서</h3>
+          <p data-ko="설치 방법, AI 명령어 예시, 파라미터 설명이 포함된 전체 가이드입니다." data-en="Full guide covering installation, AI command examples, and parameter reference.">설치 방법, AI 명령어 예시, 파라미터 설명이 포함된 전체 가이드입니다.</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <a href="KeroMixAI_사용설명서.docx" class="btn-dl btn-dl-outline">🇰🇷 한국어</a>
+            <a href="KeroMixAI_Manual_EN.docx" class="btn-dl btn-dl-outline">🇺🇸 English</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="support-box reveal" id="support">
+        <div>
+          <h3 data-ko="☕ 개발자를 응원해주세요" data-en="☕ Support the developer">☕ 개발자를 응원해주세요</h3>
+          <p data-ko="KeroMixAI는 무료 플러그인입니다. 마음에 드셨다면 커피 한 잔 사주세요!" data-en="KeroMixAI is free. If you enjoy it, consider buying me a coffee!">KeroMixAI는 무료 플러그인입니다. 마음에 드셨다면 커피 한 잔 사주세요!</p>
+        </div>
+        <a href="https://buymeacoffee.com/nadahong" target="_blank" class="btn-coffee">☕ Buy me a coffee</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-logo">🐸 KeroMixAI</div>
+    <p>developed by nadahong · built with JUCE &amp; Groq AI</p>
+    <p style="color:var(--text-dim);font-size:0.75rem;">Free · VST3 / AU</p>
+  </footer>
+
+  <script>
+    // 언어 전환
+    function setLang(lang) {
+      document.documentElement.lang = lang;
+      document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+
+      document.querySelectorAll('[data-ko]').forEach(el => {
+        const text = el.getAttribute(`data-${lang}`);
+        if (text) el.innerHTML = text;
+      });
+
+      localStorage.setItem('lang', lang);
+    }
+
+    // 저장된 언어 불러오기
+    const saved = localStorage.getItem('lang');
+    if (saved && saved !== 'ko') setLang(saved);
+
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+</html>
