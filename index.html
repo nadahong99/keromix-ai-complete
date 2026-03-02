@@ -6,9 +6,6 @@
   <title>KeroMixAI - AI Audio Mixing Plugin</title>
   <meta name="description" content="AI-powered audio plugin. Control EQ, Comp, Delay, Reverb with text. VST3/AU.">
 
-  <!-- Google AdSense - replace with your code -->
-  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 
@@ -63,13 +60,6 @@
     .btn-secondary { display: inline-flex; align-items: center; gap: 10px; background: transparent; color: var(--text); font-family: var(--mono); font-size: 0.875rem; padding: 14px 28px; border-radius: 6px; text-decoration: none; letter-spacing: 0.04em; border: 1px solid var(--border); transition: all 0.2s; }
     .btn-secondary:hover { border-color: var(--green); color: var(--green); transform: translateY(-2px); }
 
-    /* AD */
-    .ad-banner { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 16px; text-align: center; }
-    .ad-slot { min-height: 90px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border: 1px dashed var(--border); border-radius: 4px; max-width: 728px; margin: 8px auto 0; color: var(--text-dim); font-size: 0.75rem; font-family: var(--mono); }
-    .ad-inline { margin: 60px auto; text-align: center; max-width: 1100px; padding: 0 40px; }
-    .ad-inline-label { font-family: var(--mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.12em; margin-bottom: 8px; }
-    .ad-slot-rect { min-height: 250px; max-width: 336px; margin: 0 auto; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.02); border: 1px dashed var(--border); border-radius: 4px; color: var(--text-dim); font-size: 0.75rem; font-family: var(--mono); }
-
     /* SECTIONS */
     .section { padding: 100px 40px; max-width: 1100px; margin: 0 auto; }
     .section-label { font-family: var(--mono); font-size: 0.7rem; color: var(--green); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 16px; }
@@ -107,12 +97,29 @@
     .support-box { background: linear-gradient(135deg, var(--surface), var(--bg3)); border: 1px solid var(--border); border-radius: 12px; padding: 40px; display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
     .support-box h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 6px; }
     .support-box p { color: var(--text-dim); font-size: 0.9rem; }
-    .btn-coffee { display: inline-flex; align-items: center; gap: 10px; background: #FFDD00; color: #1a1a1a; font-family: var(--mono); font-size: 0.875rem; font-weight: 700; padding: 14px 24px; border-radius: 8px; text-decoration: none; letter-spacing: 0.03em; transition: all 0.2s; white-space: nowrap; }
-    .btn-coffee:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,221,0,0.3); }
-    .btn-toss { display: inline-flex; align-items: center; gap: 10px; background: #0064FF; color: #fff; font-family: var(--mono); font-size: 0.875rem; font-weight: 700; padding: 14px 24px; border-radius: 8px; text-decoration: none; letter-spacing: 0.03em; transition: all 0.2s; white-space: nowrap; }
-    .btn-toss:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,100,255,0.3); }
-    .support-buttons { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-    .support-label { font-family: var(--mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; margin-bottom: 6px; }
+    .support-buttons { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
+    .support-btn-group { display: flex; flex-direction: column; gap: 6px; }
+    .support-label { font-family: var(--mono); font-size: 0.62rem; color: var(--text-dim); letter-spacing: 0.1em; }
+
+    .btn-kakao { display: inline-flex; align-items: center; gap: 10px; background: #FFCD00; color: #1a1a1a; font-family: var(--mono); font-size: 0.875rem; font-weight: 700; padding: 14px 24px; border-radius: 8px; text-decoration: none; letter-spacing: 0.03em; transition: all 0.2s; white-space: nowrap; border: none; cursor: pointer; }
+    .btn-kakao:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,205,0,0.35); }
+    .btn-kofi { display: inline-flex; align-items: center; gap: 10px; background: #FF5E5B; color: #fff; font-family: var(--mono); font-size: 0.875rem; font-weight: 700; padding: 14px 24px; border-radius: 8px; text-decoration: none; letter-spacing: 0.03em; transition: all 0.2s; white-space: nowrap; }
+    .btn-kofi:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,94,91,0.35); }
+    .btn-toss { display: inline-flex; align-items: center; gap: 10px; background: #0064FF; color: #fff; font-family: var(--mono); font-size: 0.875rem; font-weight: 700; padding: 14px 24px; border-radius: 8px; text-decoration: none; letter-spacing: 0.03em; transition: all 0.2s; white-space: nowrap; border: none; cursor: pointer; }
+    .btn-toss:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,100,255,0.35); }
+
+    /* QR MODAL */
+    .qr-modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,0.75); backdrop-filter: blur(6px); align-items: center; justify-content: center; }
+    .qr-modal.open { display: flex; }
+    .qr-box { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 40px; text-align: center; max-width: 340px; width: 90%; position: relative; animation: fadeUp 0.3s ease both; }
+    .qr-box h4 { font-family: var(--mono); font-size: 0.85rem; color: var(--green); margin-bottom: 6px; letter-spacing: 0.08em; }
+    .qr-box p { font-size: 0.8rem; color: var(--text-dim); margin-bottom: 20px; }
+    .qr-box img { width: 200px; height: 200px; object-fit: contain; border-radius: 8px; background: #fff; padding: 8px; }
+    .qr-close { position: absolute; top: 14px; right: 16px; background: none; border: none; color: var(--text-dim); font-size: 1.2rem; cursor: pointer; transition: color 0.2s; font-family: var(--mono); }
+    .qr-close:hover { color: var(--text); }
+    .qr-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
+    .qr-tab { font-family: var(--mono); font-size: 0.72rem; padding: 6px 14px; border-radius: 6px; border: 1px solid var(--border); background: transparent; color: var(--text-dim); cursor: pointer; transition: all 0.2s; letter-spacing: 0.06em; }
+    .qr-tab.active { background: var(--green); color: #0b0f0c; border-color: var(--green); font-weight: 700; }
 
     /* FOOTER */
     footer { border-top: 1px solid var(--border); padding: 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; max-width: 1100px; margin: 0 auto; }
@@ -129,14 +136,13 @@
       .section { padding: 60px 20px; }
       .support-box { flex-direction: column; }
       footer { padding: 32px 20px; flex-direction: column; text-align: center; }
-      .ad-inline { padding: 0 20px; }
     }
   </style>
 </head>
 <body>
 
   <nav>
-    <a class="nav-logo" href="https://github.com/user-attachments/files/25675187/KeroMixAI_Windows_v1.0.0.zip">
+    <a class="nav-logo" href="#">
       <span>🐸</span> KeroMixAI
     </a>
     <div class="nav-right">
@@ -172,8 +178,6 @@
     </div>
   </section>
 
-
-
   <!-- SCREENSHOT -->
   <section class="section" id="screenshot">
     <div class="reveal">
@@ -190,15 +194,6 @@
       </div>
     </div>
   </section>
-
-  <!-- AD -->
-  <div style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:20px;text-align:center;">
-    <div style="font-family:var(--mono);font-size:0.65rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:8px;">ADVERTISEMENT</div>
-    <div style="min-height:90px;max-width:728px;margin:0 auto;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02);border:1px dashed var(--border);border-radius:4px;color:var(--text-dim);font-size:0.75rem;font-family:var(--mono);">
-      <!-- Google AdSense 728x90 코드를 여기에 붙여넣으세요 -->
-      <span>AdSense 728×90</span>
-    </div>
-  </div>
 
   <!-- FEATURES -->
   <section class="section" id="features">
@@ -241,24 +236,6 @@
     </div>
   </section>
 
-  <!-- AD -->
-  <div style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:20px;text-align:center;">
-    <div style="font-family:var(--mono);font-size:0.65rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:8px;">ADVERTISEMENT</div>
-    <div style="min-height:90px;max-width:728px;margin:0 auto;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02);border:1px dashed var(--border);border-radius:4px;color:var(--text-dim);font-size:0.75rem;font-family:var(--mono);">
-      <!-- Google AdSense 728x90 코드를 여기에 붙여넣으세요 -->
-      <span>AdSense 728×90</span>
-    </div>
-  </div>
-
-  <!-- AD -->
-  <div style="background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:20px;text-align:center;">
-    <div style="font-family:var(--mono);font-size:0.65rem;color:var(--text-dim);letter-spacing:0.1em;margin-bottom:8px;">ADVERTISEMENT</div>
-    <div style="min-height:90px;max-width:728px;margin:0 auto;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02);border:1px dashed var(--border);border-radius:4px;color:var(--text-dim);font-size:0.75rem;font-family:var(--mono);">
-      <!-- Google AdSense 728x90 코드를 여기에 붙여넣으세요 -->
-      <span>AdSense 728×90</span>
-    </div>
-  </div>
-
   <!-- DOWNLOAD -->
   <section class="download-section" id="download">
     <div class="section" style="padding-top:80px;padding-bottom:80px;">
@@ -297,19 +274,24 @@
         </div>
       </div>
 
+      <!-- SUPPORT -->
       <div class="support-box reveal" id="support">
         <div>
           <h3 data-ko="☕ 개발자를 응원해주세요" data-en="☕ Support the developer">☕ 개발자를 응원해주세요</h3>
           <p data-ko="KeroMixAI는 무료 플러그인입니다. 마음에 드셨다면 커피 한 잔 사주세요!" data-en="KeroMixAI is free. If you enjoy it, consider buying me a coffee!">KeroMixAI는 무료 플러그인입니다. 마음에 드셨다면 커피 한 잔 사주세요!</p>
         </div>
         <div class="support-buttons">
-          <div>
-            <div class="support-label" data-ko="🇰🇷 국내 후원" data-en="🇰🇷 Korean users">🇰🇷 국내 후원</div>
-            <a href="https://qr.kakaopay.com/FPUSbpm8y" target="_blank" class="btn-toss" style="background:#FFCD00;color:#1a1a1a;">💛 카카오페이 후원</a>
+          <div class="support-btn-group">
+            <span class="support-label" data-ko="🇰🇷 국내 후원" data-en="🇰🇷 Korean users">🇰🇷 국내 후원</span>
+            <button class="btn-kakao" onclick="openQR('toss')" data-ko="💙 토스" data-en="💙 Toss">💙 토스</button>
           </div>
-          <div>
-            <div class="support-label" data-ko="🌍 해외 후원" data-en="🌍 International">🌍 해외 후원</div>
-            <a href="https://ko-fi.com/nadahong" target="_blank" class="btn-coffee">☕ Ko-fi로 후원</a>
+          <div class="support-btn-group">
+            <span class="support-label" style="visibility:hidden;">-</span>
+            <button class="btn-kakao" onclick="openQR('kakao')">💛 카카오페이</button>
+          </div>
+          <div class="support-btn-group">
+            <span class="support-label" data-ko="🌍 해외 후원" data-en="🌍 International">🌍 해외 후원</span>
+            <a href="https://ko-fi.com/nadahong" target="_blank" class="btn-kofi" data-ko="☕ Ko-fi로 후원" data-en="☕ Support on Ko-fi">☕ Ko-fi로 후원</a>
           </div>
         </div>
       </div>
@@ -322,22 +304,59 @@
     <p style="color:var(--text-dim);font-size:0.75rem;">Free · VST3 / AU</p>
   </footer>
 
+  <!-- QR MODAL -->
+  <div class="qr-modal" id="qrModal" onclick="closeQROutside(event)">
+    <div class="qr-box">
+      <button class="qr-close" onclick="closeQR()">✕</button>
+      <div class="qr-tabs">
+        <button class="qr-tab active" id="tab-toss" onclick="switchTab('toss')" data-ko="💙 토스" data-en="💙 Toss">💙 토스</button>
+        <button class="qr-tab" id="tab-kakao" onclick="switchTab('kakao')">💛 카카오페이</button>
+      </div>
+      <div id="qr-toss">
+        <h4 data-ko="토스로 후원" data-en="Support via Toss">토스로 후원</h4>
+        <p data-ko="토스 앱으로 QR을 스캔해주세요" data-en="Scan with Toss app">토스 앱으로 QR을 스캔해주세요</p>
+        <img src="toss-qr.png" alt="Toss QR">
+      </div>
+      <div id="qr-kakao" style="display:none;">
+        <h4 data-ko="카카오페이로 후원" data-en="Support via KakaoPay">카카오페이로 후원</h4>
+        <p data-ko="카카오페이 앱으로 QR을 스캔해주세요" data-en="Scan with KakaoPay app">카카오페이 앱으로 QR을 스캔해주세요</p>
+        <img src="kakaopay-qr.jpg" alt="KakaoPay QR">
+      </div>
+    </div>
+  </div>
+
   <script>
+    // QR 모달
+    function openQR(type) {
+      document.getElementById('qrModal').classList.add('open');
+      switchTab(type);
+    }
+    function closeQR() {
+      document.getElementById('qrModal').classList.remove('open');
+    }
+    function closeQROutside(e) {
+      if (e.target === document.getElementById('qrModal')) closeQR();
+    }
+    function switchTab(type) {
+      document.getElementById('qr-toss').style.display = type === 'toss' ? 'block' : 'none';
+      document.getElementById('qr-kakao').style.display = type === 'kakao' ? 'block' : 'none';
+      document.getElementById('tab-toss').classList.toggle('active', type === 'toss');
+      document.getElementById('tab-kakao').classList.toggle('active', type === 'kakao');
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeQR(); });
+
     // 언어 전환
     function setLang(lang) {
       document.documentElement.lang = lang;
       document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
       document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
-
       document.querySelectorAll('[data-ko]').forEach(el => {
         const text = el.getAttribute(`data-${lang}`);
         if (text) el.innerHTML = text;
       });
-
       localStorage.setItem('lang', lang);
     }
 
-    // 저장된 언어 불러오기
     const saved = localStorage.getItem('lang');
     if (saved && saved !== 'ko') setLang(saved);
 
