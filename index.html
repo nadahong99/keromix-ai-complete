@@ -109,6 +109,10 @@
     .support-box p { color: var(--text-dim); font-size: 0.9rem; }
     .btn-coffee { display: inline-flex; align-items: center; gap: 10px; background: #FFDD00; color: #1a1a1a; font-family: var(--mono); font-size: 0.875rem; font-weight: 700; padding: 14px 24px; border-radius: 8px; text-decoration: none; letter-spacing: 0.03em; transition: all 0.2s; white-space: nowrap; }
     .btn-coffee:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,221,0,0.3); }
+    .btn-toss { display: inline-flex; align-items: center; gap: 10px; background: #0064FF; color: #fff; font-family: var(--mono); font-size: 0.875rem; font-weight: 700; padding: 14px 24px; border-radius: 8px; text-decoration: none; letter-spacing: 0.03em; transition: all 0.2s; white-space: nowrap; }
+    .btn-toss:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,100,255,0.3); }
+    .support-buttons { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    .support-label { font-family: var(--mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 0.1em; margin-bottom: 6px; }
 
     /* FOOTER */
     footer { border-top: 1px solid var(--border); padding: 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; max-width: 1100px; margin: 0 auto; }
@@ -298,7 +302,16 @@
           <h3 data-ko="☕ 개발자를 응원해주세요" data-en="☕ Support the developer">☕ 개발자를 응원해주세요</h3>
           <p data-ko="KeroMixAI는 무료 플러그인입니다. 마음에 드셨다면 커피 한 잔 사주세요!" data-en="KeroMixAI is free. If you enjoy it, consider buying me a coffee!">KeroMixAI는 무료 플러그인입니다. 마음에 드셨다면 커피 한 잔 사주세요!</p>
         </div>
-        <a href="https://buymeacoffee.com/nadahong" target="_blank" class="btn-coffee">☕ Buy me a coffee</a>
+        <div class="support-buttons">
+          <div>
+            <div class="support-label" data-ko="🇰🇷 국내 후원" data-en="🇰🇷 Korean users">🇰🇷 국내 후원</div>
+            <a href="https://qr.kakaopay.com/FPUSbpm8y" target="_blank" class="btn-toss" style="background:#FFCD00;color:#1a1a1a;">💛 카카오페이 후원</a>
+          </div>
+          <div>
+            <div class="support-label" data-ko="🌍 해외 후원" data-en="🌍 International">🌍 해외 후원</div>
+            <a href="https://ko-fi.com/nadahong" target="_blank" class="btn-coffee">☕ Ko-fi로 후원</a>
+          </div>
+        </div>
       </div>
     </div>
   </section>
