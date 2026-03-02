@@ -15,34 +15,27 @@ jobs:
 
       - name: Clone JUCE
         run: |
-          git clone --depth 1 --branch 7.0.9 https://github.com/juce-framework/JUCE.git ../JUCE
+          git clone --depth 1 --branch 7.0.9 https://github.com/juce-framework/JUCE.git JUCE
 
-      - name: Install Projucer
+      - name: Configure CMake
         run: |
-          curl -L "https://github.com/juce-framework/JUCE/releases/download/7.0.9/juce-7.0.9-osx.zip" -o juce-osx.zip
-          unzip -q juce-osx.zip -d juce-pkg
-          PROJUCER=$(find juce-pkg -name "Projucer" -type f | head -1)
-          cp "$PROJUCER" /usr/local/bin/projucer
-          chmod +x /usr/local/bin/projucer
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DJUCE_DIR="$GITHUB_WORKSPACE/JUCE" \
+            -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13 \
+            -G Xcode
 
-      - name: Generate Xcode project
-        run: projucer --resave KeroMixAI.jucer
-
-      - name: Build Release (VST3 + AU)
+      - name: Build
         run: |
-          xcodebuild -project Builds/MacOSX/KeroMixAI.xcodeproj \
-                     -scheme "KeroMixAI - All" \
-                     -configuration Release \
-                     -derivedDataPath build \
-                     CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
-                     ARCHS="arm64 x86_64" \
-                     build
+          cmake --build build --config Release --parallel
 
       - name: Collect artifacts
         run: |
           mkdir -p dist
           find build -name "*.vst3" -exec cp -r {} dist/ \;
           find build -name "*.component" -exec cp -r {} dist/ \;
+          ls -la dist/
 
       - name: Upload VST3 & AU
         uses: actions/upload-artifact@v4
