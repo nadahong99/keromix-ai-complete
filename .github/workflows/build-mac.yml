@@ -19,14 +19,10 @@ jobs:
 
       - name: Install Projucer
         run: |
-          cd ../JUCE/extras/Projucer/Builds/MacOSX
-          xcodebuild -project Projucer.xcodeproj \
-                     -scheme Projucer \
-                     -configuration Release \
-                     -derivedDataPath build \
-                     CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO \
-                     build
-          cp build/Build/Products/Release/Projucer.app/Contents/MacOS/Projucer /usr/local/bin/projucer
+          curl -L "https://github.com/juce-framework/JUCE/releases/download/7.0.9/juce-7.0.9-osx.zip" -o juce-osx.zip
+          unzip -q juce-osx.zip -d juce-pkg
+          PROJUCER=$(find juce-pkg -name "Projucer" -type f | head -1)
+          cp "$PROJUCER" /usr/local/bin/projucer
           chmod +x /usr/local/bin/projucer
 
       - name: Generate Xcode project
