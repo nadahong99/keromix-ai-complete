@@ -575,8 +575,7 @@ void KeroMixAIAudioProcessorEditor::run()
         ws = url.withPOSTData(body).createInputStream(
             juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inPostData)
             .withExtraHeaders("Authorization: Bearer " + groqApiKey + "\r\nContent-Type: application/json")
-            .withConnectionTimeoutMs(30000)
-            .withReadTimeoutMs(30000));
+            .withConnectionTimeoutMs(30000));
     } catch (...) {
         juce::MessageManager::callAsync([this]() {
             statusLabel.setText("Network error. Check internet connection.", juce::dontSendNotification);
