@@ -1,4 +1,4 @@
-﻿#include "PluginProcessor.h"
+#include "PluginProcessor.h"
 #include "PluginEditor.h"
 
 // -- Colours -------------------------------------------------------------------
@@ -250,17 +250,55 @@ void KeroMixAIAudioProcessorEditor::restoreSnapshot()
 // -- API key -------------------------------------------------------------------
 void KeroMixAIAudioProcessorEditor::saveApiKey(const juce::String& key)
 {
-    auto dir = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory)
+    juce::File dir;
+    
+#if JUCE_MAC
+    // Mac: ~/Library/Application Support/KeroMixAI/
+    dir = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory)
         .getChildFile("KeroMixAI");
-    dir.createDirectory();
-    dir.getChildFile("config.txt").replaceWithText(key);
+#else
+    // Windows: AppData/KeroMixAI/
+    dir = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory)
+        .getChildFile("KeroMixAI");
+#endif
+    
+    if (!dir.createDirectory())
+    {
+        // Fallback to Music directory if AppData fails (rare but safe for AU)
+        dir = juce::File::getSpecialLocation(juce::File::userMusicDirectory)
+            .getChildFile(".keromix");
+        dir.createDirectory();
+    }
+    
+    auto configFile = dir.getChildFile("config.txt");
+    configFile.replaceWithText(key);
 }
 
 juce::String KeroMixAIAudioProcessorEditor::loadApiKey()
 {
-    auto f = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory)
+    juce::File f;
+    
+#if JUCE_MAC
+    // Mac: try ~/Library/Application Support/KeroMixAI/config.txt first
+    f = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory)
         .getChildFile("KeroMixAI").getChildFile("config.txt");
-    return f.existsAsFile() ? f.loadFileAsString().trim() : juce::String();
+    if (f.existsAsFile())
+        return f.loadFileAsString().trim();
+    
+    // Fallback to ~/.keromix/config.txt
+    f = juce::File::getSpecialLocation(juce::File::userMusicDirectory)
+        .getChildFile(".keromix").getChildFile("config.txt");
+    if (f.existsAsFile())
+        return f.loadFileAsString().trim();
+#else
+    // Windows: ~/AppData/Roaming/KeroMixAI/config.txt
+    f = juce::File::getSpecialLocation(juce::File::userApplicationDataDirectory)
+        .getChildFile("KeroMixAI").getChildFile("config.txt");
+    if (f.existsAsFile())
+        return f.loadFileAsString().trim();
+#endif
+    
+    return juce::String();
 }
 
 // -- FFT helpers ---------------------------------------------------------------
@@ -531,21 +569,52 @@ void KeroMixAIAudioProcessorEditor::run()
         << "\"max_tokens\":500,\"temperature\":0.35}";
 
     juce::URL url("https://api.groq.com/openai/v1/chat/completions");
-    auto ws = url.withPOSTData(body).createInputStream(
-        juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inPostData)
-        .withExtraHeaders("Authorization: Bearer " + groqApiKey + "\r\nContent-Type: application/json")
-        .withConnectionTimeoutMs(15000));
-
-    if (!ws) {
+    std::unique_ptr<juce::InputStream> ws;
+    
+    try {
+        ws = url.withPOSTData(body).createInputStream(
+            juce::URL::InputStreamOptions(juce::URL::ParameterHandling::inPostData)
+            .withExtraHeaders("Authorization: Bearer " + groqApiKey + "\r\nContent-Type: application/json")
+            .withConnectionTimeoutMs(30000)
+            .withReadTimeoutMs(30000));
+    } catch (...) {
         juce::MessageManager::callAsync([this]() {
-            statusLabel.setText("Connection failed.", juce::dontSendNotification);
+            statusLabel.setText("Network error. Check internet connection.", juce::dontSendNotification);
             sendBtn.setEnabled(true);
             for (int i = 0; i < NUM_QUICK; ++i) quickBtns[i].setEnabled(true);
             });
         return;
     }
 
-    juce::String resp = ws->readEntireStreamAsString();
+    if (!ws) {
+        juce::MessageManager::callAsync([this]() {
+            statusLabel.setText("Connection failed. Check API key.", juce::dontSendNotification);
+            sendBtn.setEnabled(true);
+            for (int i = 0; i < NUM_QUICK; ++i) quickBtns[i].setEnabled(true);
+            });
+        return;
+    }
+
+    juce::String resp;
+    try {
+        resp = ws->readEntireStreamAsString();
+    } catch (...) {
+        juce::MessageManager::callAsync([this]() {
+            statusLabel.setText("Response timeout. Try again.", juce::dontSendNotification);
+            sendBtn.setEnabled(true);
+            for (int i = 0; i < NUM_QUICK; ++i) quickBtns[i].setEnabled(true);
+            });
+        return;
+    }
+    
+    if (resp.isEmpty()) {
+        juce::MessageManager::callAsync([this]() {
+            statusLabel.setText("Empty response from server.", juce::dontSendNotification);
+            sendBtn.setEnabled(true);
+            for (int i = 0; i < NUM_QUICK; ++i) quickBtns[i].setEnabled(true);
+            });
+        return;
+    }
     juce::String pj;
     int ci = resp.indexOf("\"content\":\"");
     if (ci >= 0) {
